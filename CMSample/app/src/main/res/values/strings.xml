@@ -1,3 +1,24 @@
 <resources>
-    <string name="app_name">CMSample</string>
+    <string name="app_name">LD SDK Sample</string>
+
+    <string name="btn_login_wx">微信登陆</string>
+    <string name="btn_login_qq">QQ登陆</string>
+    <string name="btn_login_ali">支付宝登陆</string>
+    <string name="btn_login_wb">微博登陆</string>
+
+    <string name="btn_pay_wx">微信支付</string>
+    <string name="btn_pay_qq">QQ支付</string>
+    <string name="btn_pay_ali">支付宝支付</string>
+    <string name="btn_pay_wb">微博支付</string>
+
+    <string name="btn_share_wx">微信分享</string>
+    <string name="btn_share_qq">QQ分享</string>
+    <string name="btn_share_ali">支付宝分享</string>
+    <string name="btn_share_wb">微博分享</string>
+    <string name="todo">TODO</string>
+
+    <string name="errcode_success">发送成功</string>
+    <string name="errcode_cancel">发送取消</string>
+    <string name="errcode_deny">发送被拒绝</string>
+    <string name="errcode_unknown">发送返回</string>
 </resources>

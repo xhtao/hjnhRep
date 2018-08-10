@@ -3,10 +3,15 @@
     <words>
       <w>cmsample</w>
       <w>cmsdk</w>
+      <w>connetion</w>
+      <w>opensdk</w>
       <w>scret</w>
       <w>snsapi</w>
+      <w>tencent</w>
       <w>userinfo</w>
       <w>usersecret</w>
+      <w>webpage</w>
+      <w>wxstate</w>
     </words>
   </dictionary>
 </component>
