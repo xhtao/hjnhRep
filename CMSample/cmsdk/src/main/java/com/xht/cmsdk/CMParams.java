@@ -22,6 +22,9 @@ public class CMParams {
     private String          appSecret           = null;
     private final String    USERSECRET          = "snsapi_userinfo";//--只读
     private final String    WXSTATE             = "com_xht_cmsdk_state";//--只读
+    private String          code                = null;//请求token的code
+    private String          accessToken         = null;//token
+    private String          openId              = null;//openId
 
     //支付
 
@@ -56,6 +59,30 @@ public class CMParams {
 
     public void setAppSecret(String appSecret) {
         this.appSecret = appSecret;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public String getOpenId() {
+        return openId;
+    }
+
+    public void setOpenId(String openId) {
+        this.openId = openId;
     }
 
     public OperateType getOperateType() {
@@ -209,6 +236,10 @@ public class CMParams {
         private String          appSecret           = null;
         private ChannelType     channelType         = null;
         private OperateType     operateType         = null;
+        private String          code                = null;//请求token的code
+        private String          accessToken         = null;//token
+        private String          openId              = null;//openId
+
         public LoginBuilder(Activity mActivity){
             activity = mActivity;
         }
@@ -233,6 +264,21 @@ public class CMParams {
             return this;
         }
 
+        public CMParams.LoginBuilder code(final String _code){
+            code = _code;
+            return this;
+        }
+
+        public CMParams.LoginBuilder accessToken(final String _token){
+            accessToken = _token;
+            return this;
+        }
+
+        public CMParams.LoginBuilder openId(final String _openid){
+            openId = _openid;
+            return this;
+        }
+
         public CMParams build(){
             CMParams params = new CMParams();
 
@@ -241,6 +287,9 @@ public class CMParams {
             params.setAppSecret(appSecret);
             params.setChannelType(channelType);
             params.setOperateType(operateType);
+            params.setCode(code);
+            params.setAccessToken(accessToken);
+            params.setOpenId(openId);
 
             return params;
         }

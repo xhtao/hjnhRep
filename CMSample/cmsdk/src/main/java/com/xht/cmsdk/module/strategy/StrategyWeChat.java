@@ -21,6 +21,7 @@ import com.xht.cmsdk.CMSDK;
 import com.xht.cmsdk.callback.CMEventListener;
 import com.xht.cmsdk.enums.ShareType;
 import com.xht.cmsdk.module.BaseModule;
+import com.xht.cmsdk.service.ServiceLogic;
 
 import java.io.ByteArrayOutputStream;
 
@@ -43,6 +44,8 @@ public class StrategyWeChat extends BaseModule {
     public static StrategyWeChat getInstance(final CMParams params, final CMEventListener iListener){
         if (instance == null){
             instance = new StrategyWeChat(params, iListener);
+        }else{
+            instance.update(params, iListener);
         }
         return instance;
     }
@@ -59,13 +62,13 @@ public class StrategyWeChat extends BaseModule {
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                int type = intent.getIntExtra(WECHAT_LOGIN_RESULT_TYPE, -100);
-                int errorCode = intent.getIntExtra(WECHAT_LOGIN_RESULT_EXTRA, -100);
+                int type = intent.getIntExtra(WECHAT_RESULT_TYPE, -100);
+                int errorCode = intent.getIntExtra(WECHAT_RESULT_EXTRA, -100);
 
                 CMLog.log("com.xht.cmsdk.module.strategy.StrategyWeChat", "onReceive", "授权成功返回", "获取access_token和user info", type+"");
                 switch (type){
                     case ConstantsAPI.COMMAND_SENDAUTH://登陆
-                        String code = intent.getStringExtra(WECHAT_LOGIN_RESULT_CODE);
+                        String code = intent.getStringExtra(WECHAT_RESULT_CODE);
                         onWeChatLoginResult(errorCode, code);
                         break;
                     case ConstantsAPI.COMMAND_SENDMESSAGE_TO_WX://分享
@@ -87,7 +90,8 @@ public class StrategyWeChat extends BaseModule {
             case BaseResp.ErrCode.ERR_OK://用户同意
                 CMLog.log("onWeChatLoginResult", "用户同意");
                 listener.onRequestStart();
-
+                //请求access_token
+                ServiceLogic.getAccessToken(cmParams, listener);
                 break;
             case BaseResp.ErrCode.ERR_AUTH_DENIED://用户拒绝授权
                 CMLog.log("onWeChatLoginResult", "用户拒绝授权");
@@ -105,15 +109,12 @@ public class StrategyWeChat extends BaseModule {
     private void onWeChatShareResult(final int errorCode){
         switch (errorCode){
             case BaseResp.ErrCode.ERR_OK://分享成功
-                CMLog.log("onWeChatShareResult", "分享成功");
                 listener.onEventSuccess(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_SHARE_SUCCESS, null);
                 break;
             case BaseResp.ErrCode.ERR_AUTH_DENIED://分享失败
-                CMLog.log("onWeChatShareResult", "分享失败");
                 listener.onEventFailed(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_SHARE_FAILED);
                 break;
             case BaseResp.ErrCode.ERR_USER_CANCEL://分享取消
-                CMLog.log("onWeChatShareResult", "分享取消");
                 listener.onEventCancel(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_SHARE_CANCEL);
                 break;
         }
@@ -176,6 +177,10 @@ public class StrategyWeChat extends BaseModule {
         registerResultBroadcast(mContext, WECHAT_SHARE_RESULT_ACTION);
     }
 
+    /**
+     *
+     * @return
+     */
     private WXMediaMessage.IMediaObject getShareObject(){
         switch (cmParams.getShareType()){
             case Text:
@@ -198,10 +203,21 @@ public class StrategyWeChat extends BaseModule {
         }
     }
 
+    /**
+     *
+     * @param type
+     * @return
+     */
     private static String buildTransaction(final String type) {
         return (type == null) ? String.valueOf(System.currentTimeMillis()) : type + System.currentTimeMillis();
     }
 
+    /**
+     *
+     * @param bmp
+     * @param needRecycle
+     * @return
+     */
     private byte[] bmpToByteArray(final Bitmap bmp, final boolean needRecycle) {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.PNG, 100, output);

@@ -3,7 +3,6 @@ package com.xht.cmsample.wxapi;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.tencent.mm.opensdk.constants.ConstantsAPI;
@@ -25,18 +24,11 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
     private IWXAPI mWxApi;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mWxApi = WXAPIFactory.createWXAPI(this, CMSDK.getInstance().getAppId());
+        mWxApi = WXAPIFactory.createWXAPI(this, CMSDK.getInstance().getAppId(), true);
         mWxApi.handleIntent(getIntent(), this);
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent);
-        mWxApi.handleIntent(intent, this);
     }
 
     @Override
@@ -56,10 +48,10 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
     private void sendWeChatBroadcast(final int errorCode, final int type, final String code){
         LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
         Intent weChatResult = new Intent();
-        weChatResult.setAction(BaseModule.WECHAT_LOGIN_RESULT_ACTION);
-        weChatResult.putExtra(BaseModule.WECHAT_LOGIN_RESULT_TYPE, type);
-        weChatResult.putExtra(BaseModule.WECHAT_LOGIN_RESULT_EXTRA, errorCode);
-        weChatResult.putExtra(BaseModule.WECHAT_LOGIN_RESULT_CODE, code);
+        weChatResult.setAction(BaseModule.weChat_result_action);
+        weChatResult.putExtra(BaseModule.WECHAT_RESULT_TYPE, type);
+        weChatResult.putExtra(BaseModule.WECHAT_RESULT_EXTRA, errorCode);
+        weChatResult.putExtra(BaseModule.WECHAT_RESULT_CODE, code);
         broadcastManager.sendBroadcast(weChatResult);
         finish();
     }

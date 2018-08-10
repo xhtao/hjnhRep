@@ -19,27 +19,30 @@ public abstract class BaseModule implements IModule{
     protected CMParams cmParams = null;
     protected CMEventListener listener = null;
 
+    public static String weChat_result_action = null;
 
     public static final String WECHAT_LOGIN_RESULT_ACTION = "com.tencent.mm.opensdk.WECHAT_LOGIN_RESULT_ACTION";
-    public static final String WECHAT_LOGIN_RESULT_TYPE = "com.tencent.mm.opensdk.WECHAT_LOGIN_RESULT_TYPE";
-    public static final String WECHAT_LOGIN_RESULT_EXTRA = "com.tencent.mm.opensdk.WECHAT_LOGIN_RESULT_EXTRA";
-    public static final String WECHAT_LOGIN_RESULT_CODE = "com.tencent.mm.opensdk.WECHAT_LOGIN_RESULT_CODE";
-
     public static final String WECHAT_PAY_RESULT_ACTION = "com.tencent.mm.opensdk.WECHAT_PAY_RESULT_ACTION";
-    public static final String WECHAT_PAY_RESULT_EXTRA = "com.tencent.mm.opensdk.WECHAT_PAY_RESULT_EXTRA";
-
     public static final String WECHAT_SHARE_RESULT_ACTION = "com.tencent.mm.opensdk.WECHAT_SHARE_RESULT_ACTION";
-    public static final String WECHAT_SHARE_RESULT_TYPE = "com.tencent.mm.opensdk.WECHAT_SHARE_RESULT_TYPE";
-    public static final String WECHAT_SHARE_RESULT_EXTRA = "com.tencent.mm.opensdk.WECHAT_SHARE_RESULT_EXTRA";
-    public static final String WECHAT_SHARE_RESULT_CODE = "com.tencent.mm.opensdk.WECHAT_SHARE_RESULT_CODE";
+
+    public static final String WECHAT_RESULT_TYPE = "com.tencent.mm.opensdk.WECHAT_RESULT_TYPE";
+    public static final String WECHAT_RESULT_EXTRA = "com.tencent.mm.opensdk.WECHAT_RESULT_EXTRA";
+    public static final String WECHAT_RESULT_CODE = "com.tencent.mm.opensdk.WECHAT_RESULT_CODE";
+
 
     public BaseModule(final CMParams params, CMEventListener iListener){
         cmParams = params;
         listener = iListener;
     }
 
+    public void update(final CMParams params, CMEventListener iListener){
+        cmParams = params;
+        listener = iListener;
+    }
+
     protected void registerResultBroadcast(final Context context, final String action){
         if (mReceiver == null){ return; }
+        weChat_result_action = action;
         mBroadcastManager = LocalBroadcastManager.getInstance(context);
         IntentFilter filter = new IntentFilter(action);
         mBroadcastManager.registerReceiver(mReceiver, filter);
@@ -48,6 +51,7 @@ public abstract class BaseModule implements IModule{
     protected void unRegisterResultBroadcast(){
         if (mBroadcastManager != null && mReceiver != null) {
             mBroadcastManager.unregisterReceiver(mReceiver);
+            weChat_result_action = null;
             mBroadcastManager = null;
             mReceiver = null;
         }

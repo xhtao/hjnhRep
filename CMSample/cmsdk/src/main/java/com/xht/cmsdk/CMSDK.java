@@ -47,8 +47,8 @@ public final class CMSDK {
     }
 
     public CMSDK CMShare(){
-        StrategyWeChat login = StrategyWeChat.getInstance(mParams, eventListener);
-        login.doShare();
+        StrategyWeChat share = StrategyWeChat.getInstance(mParams, eventListener);
+        share.doShare();
         return this;
     }
 
@@ -63,6 +63,11 @@ public final class CMSDK {
         public static final int ERROR_CODE_WECHAT_SHARE_SUCCESS = 1002;//微信分享成功
         public static final int ERROR_CODE_WECHAT_SHARE_FAILED = 1003;//微信分享失败
         public static final int ERROR_CODE_WECHAT_SHARE_CANCEL = 1004;//微信分享取消
+
+        public static final int ERROR_CODE_WECHAT_LOGIN_SUCCESS = 1005;//登陆成功
+        public static final int ERROR_CODE_WECHAT_LOGIN_TOKEN_FAIL = 1006;//获取token失败
+        public static final int ERROR_CODE_WECHAT_LOGIN_USERINFO_FAIL = 1007;//获取user info失败
+
 
         public CMErrorCode(){}
     }

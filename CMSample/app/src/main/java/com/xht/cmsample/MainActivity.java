@@ -5,7 +5,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.xht.cmsdk.CMParams;
@@ -28,10 +30,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             R.string.btn_share_wx, R.string.btn_share_qq, R.string.btn_share_wb, R.string.btn_share_ali
     };
 
+    private ProgressBar connectBar = null;
+    private boolean canClicked = true;
+
     private CMSDK cmsdk = null;
     private String appId = "wx5c8e39a102ac7c0c";
-    private String secret = "snsapi_userinfo";
-    private String secret_uninfo = "58456f7da5cec66a3b3f98f774e562a0";
+    private String secret = "58456f7da5cec66a3b3f98f774e562a0";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +64,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         BtnLvAdapter adapter = new BtnLvAdapter(this, btnDataList);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(this);
+
+        connectBar = (ProgressBar) findViewById(R.id.connectBar);
+        connectLoading("hide");
     }
 
     private void initData(){
@@ -67,17 +74,65 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         cmsdk = CMSDK.getInstance();
     }
 
+    private void connectLoading(String type){
+        switch (type){
+            case "show":
+                if (canClicked == false){ return; }
+                canClicked = false;
+                listView.setEnabled(canClicked);
+                connectBar.setVisibility(View.VISIBLE);
+                break;
+            case "hide":
+                if (canClicked == true){ return; }
+                canClicked = true;
+                listView.setEnabled(canClicked);
+                connectBar.setVisibility(View.INVISIBLE);
+                break;
+        }
+    }
+
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (canClicked == false){ return; }
+        Toast.makeText(MainActivity.this, "item 被点击：" + position, Toast.LENGTH_SHORT).show();
         switch (position){
             case 0:
+                CMParams paramsL = new CMParams.LoginBuilder(this)
+                        .appID(appId)
+                        .appSecret(secret)
+                        .channelType(ChannelType.TypeWeChat)
+                        .operateType(OperateType.TypeLogin)
+                        .build();
+                cmsdk.setParams(paramsL)
+                        .setEventListener(new CMEventListener() {
+                            @Override
+                            public void onRequestStart() {
+                                connectLoading("show");
+                            }
 
+                            @Override
+                            public void onEventSuccess(int code, String jsonString) {
+                                connectLoading("hide");
+                            }
+
+                            @Override
+                            public void onEventFailed(int code) {
+                                connectLoading("hide");
+                                Toast.makeText(MainActivity.this, "登陆失败:" + code, Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onEventCancel(int code) {
+                                connectLoading("hide");
+                            }
+                        });
+                cmsdk.CMLogin();
                 break;
             case 4:
 
                 break;
             case 8:
-                CMParams params = new CMParams.ShareBuilder(this)
+                CMParams paramsS = new CMParams.ShareBuilder(this)
                         .appID(appId)
                         .channelType(ChannelType.TypeWeChat)
                         .operateType(OperateType.TypeShare)
@@ -85,10 +140,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         .shareTitle("百度一下")
                         .shareDescription("百度一下，你就知道... ...")
                         .shareBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.share_iamge))
-                        .sharePosition(ShareType.Session)
+                        .sharePosition(ShareType.Timeline)
                         .shareUrl("http://www.baidu.com")
                         .build();
-                cmsdk.setParams(params)
+                cmsdk.setParams(paramsS)
                         .setEventListener(new CMEventListener() {
                             @Override
                             public void onRequestStart() {
