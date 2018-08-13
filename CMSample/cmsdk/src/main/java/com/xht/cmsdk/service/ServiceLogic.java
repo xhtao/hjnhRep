@@ -10,6 +10,7 @@ import com.xht.cmsdk.enums.NetworkType;
 import com.xht.cmsdk.network.ConnParams;
 import com.xht.cmsdk.network.IServerConnect;
 import com.xht.cmsdk.network.ServerConnectFactory;
+import com.xht.cmsdk.utils.CMUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,7 +33,7 @@ public class ServiceLogic {
 
 
         IServerConnect connect = ServerConnectFactory.createConnect(NetworkType.HttpsUrlConnection);
-        connect.getRequest(new ConnParams(path, paramMap), new IServerConnect.Callback<String>(){
+        connect.getRequest(new ConnParams(path, CMUtil.map_to_string(paramMap, "utf-8")), new IServerConnect.Callback<String>(){
 
             @Override
             public void onSuccess(String jsonStr) {
@@ -62,7 +63,7 @@ public class ServiceLogic {
         paramMap.put("openid", cmParams.getOpenId());
 
         IServerConnect connect = ServerConnectFactory.createConnect(NetworkType.HttpsUrlConnection);
-        connect.getRequest(new ConnParams(path, paramMap), new IServerConnect.Callback() {
+        connect.getRequest(new ConnParams(path, CMUtil.map_to_string(paramMap, "utf-8")), new IServerConnect.Callback() {
             @Override
             public void onSuccess(String jsonStr) {
                 listener.onEventSuccess(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_LOGIN_SUCCESS, jsonStr);

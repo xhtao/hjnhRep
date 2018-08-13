@@ -5,11 +5,13 @@ package com.xht.cmsdk.network;
  */
 
 public interface IServerConnect {
+    public static final int TIMEOUT = 30000;
+
     interface Callback<R>{
         void onSuccess(String jsonStr);
         void onFailed(String jsonStr);
     }
 
-    void getRequest(ConnParams params, Callback callback);
-    void postRequest(ConnParams params, Callback callback);
+    String getRequest(ConnParams params, Callback callback);
+    String postRequest(ConnParams params, Callback callback);
 }

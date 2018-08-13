@@ -27,6 +27,14 @@ public class CMParams {
     private String          openId              = null;//openId
 
     //支付
+    private String          mchID               = null;
+    private String          orderNum            = null;
+    private String          itemName            = null;
+    private String          itemDetail          = null;
+    private int             itemPrice           = 0;
+    private String          notifyUrl           = null;
+    private String          signKey             = null;//商户平台设置的密钥key
+
 
     //分享
     private ShareType       shareType           = null;
@@ -109,6 +117,62 @@ public class CMParams {
         return shareTitle;
     }
 
+    public String getMchID() {
+        return mchID;
+    }
+
+    public void setMchID(String mchID) {
+        this.mchID = mchID;
+    }
+
+    public String getOrderNum() {
+        return orderNum;
+    }
+
+    public void setOrderNum(String orderNum) {
+        this.orderNum = orderNum;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public String getItemDetail() {
+        return itemDetail;
+    }
+
+    public void setItemDetail(String itemDetail) {
+        this.itemDetail = itemDetail;
+    }
+
+    public int getItemPrice() {
+        return itemPrice;
+    }
+
+    public void setItemPrice(int itemPrice) {
+        this.itemPrice = itemPrice;
+    }
+
+    public String getNotifyUrl() {
+        return notifyUrl;
+    }
+
+    public void setNotifyUrl(String notifyUrl) {
+        this.notifyUrl = notifyUrl;
+    }
+
+    public String getSignKey() {
+        return signKey;
+    }
+
+    public void setSignKey(String signKey) {
+        this.signKey = signKey;
+    }
+
     /**
      * 默认分享到朋友圈
      * @return
@@ -184,8 +248,13 @@ public class CMParams {
         private String          appSecret           = null;
         private ChannelType     channelType         = null;
         private OperateType     operateType         = null;
-
-
+        private String          mchID               = null;
+        private String          orderNum            = null;
+        private String          itemName            = null;
+        private String          itemDetail          = null;
+        private int             itemPrice           = 0;
+        private String          notifyUrl           = null;
+        private String          signKey             = null;//商户平台设置的密钥key
 
         public PayBuilder(Activity mActivity){
             activity = mActivity;
@@ -211,6 +280,41 @@ public class CMParams {
             return this;
         }
 
+        public CMParams.PayBuilder mchID(final String mchid){
+            mchID = mchid;
+            return this;
+        }
+
+        public CMParams.PayBuilder orderNum(final String ordernum){
+            orderNum = ordernum;
+            return this;
+        }
+
+        public CMParams.PayBuilder itemName(final String itemname){
+            itemName = itemname;
+            return this;
+        }
+
+        public CMParams.PayBuilder itemDetail(final String itemdetail){
+            itemDetail = itemdetail;
+            return this;
+        }
+
+        public CMParams.PayBuilder itemPrice(final int itemprice){
+            itemPrice = itemprice;
+            return this;
+        }
+
+        public CMParams.PayBuilder notifyUrl(final String notifyurl){
+            notifyUrl = notifyurl;
+            return this;
+        }
+
+        public CMParams.PayBuilder signKey(final String signkey){
+            signKey = signkey;
+            return this;
+        }
+
 
         public CMParams build(){
             CMParams params = new CMParams();
@@ -220,6 +324,13 @@ public class CMParams {
             params.setAppSecret(appSecret);
             params.setChannelType(channelType);
             params.setOperateType(operateType);
+            params.setMchID(mchID);
+            params.setOrderNum(orderNum);
+            params.setItemName(itemName);
+            params.setItemDetail(itemDetail);
+            params.setItemPrice(itemPrice);
+            params.setNotifyUrl(notifyUrl);
+            params.setSignKey(signKey);
 
             return params;
         }

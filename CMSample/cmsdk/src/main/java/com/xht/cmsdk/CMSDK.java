@@ -41,16 +41,33 @@ public final class CMSDK {
     }
 
     public CMSDK CMLogin(){
-        StrategyWeChat login = StrategyWeChat.getInstance(mParams, eventListener);
-        login.doLogin();
+        StrategyWeChat login = StrategyWeChat.getInstance();
+        login.setParams(mParams)
+                .setListener(eventListener)
+                .create()
+                .doLogin();
         return this;
     }
 
     public CMSDK CMShare(){
-        StrategyWeChat share = StrategyWeChat.getInstance(mParams, eventListener);
-        share.doShare();
+        StrategyWeChat share = StrategyWeChat.getInstance();
+        share.setParams(mParams)
+                .setListener(eventListener)
+                .create()
+                .doShare();
         return this;
     }
+
+    public CMSDK CMPay(){
+        StrategyWeChat pay = StrategyWeChat.getInstance();
+        pay.setParams(mParams)
+                .setListener(eventListener)
+                .create()
+                .doPay();
+        return this;
+    }
+
+
 
     public class CMErrorCode{
         /*通用返回码：-1开始*/
@@ -67,6 +84,12 @@ public final class CMSDK {
         public static final int ERROR_CODE_WECHAT_LOGIN_SUCCESS = 1005;//登陆成功
         public static final int ERROR_CODE_WECHAT_LOGIN_TOKEN_FAIL = 1006;//获取token失败
         public static final int ERROR_CODE_WECHAT_LOGIN_USERINFO_FAIL = 1007;//获取user info失败
+
+        public static final int ERROR_CODE_WECHAT_PAY_SUCCESS = 1008;//微信支付成功
+        public static final int ERROR_CODE_WECHAT_PAY_FAILED = 1009;//微信支付失败
+        public static final int ERROR_CODE_WECHAT_PAY_CANCEL = 1010;//微信支付取消
+        public static final int ERROR_CODE_WECHAT_PAY_ORDER = 1011;//微信支付下单成功
+
 
 
         public CMErrorCode(){}

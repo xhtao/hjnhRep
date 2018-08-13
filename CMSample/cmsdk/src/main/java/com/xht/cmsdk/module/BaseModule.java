@@ -30,14 +30,21 @@ public abstract class BaseModule implements IModule{
     public static final String WECHAT_RESULT_CODE = "com.tencent.mm.opensdk.WECHAT_RESULT_CODE";
 
 
-    public BaseModule(final CMParams params, CMEventListener iListener){
-        cmParams = params;
-        listener = iListener;
+    public BaseModule(){
     }
 
-    public void update(final CMParams params, CMEventListener iListener){
+    public BaseModule setParams(final CMParams params){
         cmParams = params;
+        return this;
+    }
+
+    public BaseModule setListener(CMEventListener iListener){
         listener = iListener;
+        return this;
+    }
+
+    public BaseModule create(){
+        return this;
     }
 
     protected void registerResultBroadcast(final Context context, final String action){

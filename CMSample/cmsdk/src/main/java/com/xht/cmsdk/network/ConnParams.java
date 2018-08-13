@@ -8,9 +8,9 @@ import java.util.Map;
 
 public class ConnParams {
     private String connUrl = null;
-    private Map<String, String> params = null;
+    private String params = null;
 
-    public ConnParams(final String url, final Map<String, String> paramMap){
+    public ConnParams(final String url, final String paramMap){
         connUrl = url;
         params = paramMap;
     }
@@ -23,11 +23,11 @@ public class ConnParams {
         this.connUrl = connUrl;
     }
 
-    public Map<String, String> getParams() {
+    public String getParams() {
         return params;
     }
 
-    public void setParams(Map<String, String> params) {
+    public void setParams(String params) {
         this.params = params;
     }
 }

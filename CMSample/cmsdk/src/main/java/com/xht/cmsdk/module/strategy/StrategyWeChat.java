@@ -13,15 +13,16 @@ import com.tencent.mm.opensdk.modelmsg.WXImageObject;
 import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
 import com.tencent.mm.opensdk.modelmsg.WXTextObject;
 import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
+import com.tencent.mm.opensdk.modelpay.PayReq;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.xht.cmsdk.CMLog;
-import com.xht.cmsdk.CMParams;
 import com.xht.cmsdk.CMSDK;
-import com.xht.cmsdk.callback.CMEventListener;
 import com.xht.cmsdk.enums.ShareType;
 import com.xht.cmsdk.module.BaseModule;
 import com.xht.cmsdk.service.ServiceLogic;
+import com.xht.cmsdk.tasks.WeChatLoginTask;
+import com.xht.cmsdk.tasks.taskrely.TaskParams;
 
 import java.io.ByteArrayOutputStream;
 
@@ -34,20 +35,23 @@ public class StrategyWeChat extends BaseModule {
     private Context mContext = null;
     private IWXAPI iwxapi = null;
 
-    private StrategyWeChat(final CMParams params, final CMEventListener iListener) {
-        super(params, iListener);
-        mContext = params.getActivity();
-        initWXAPI();
-        initBroadcast();
+    private StrategyWeChat() {
+        super();
     }
 
-    public static StrategyWeChat getInstance(final CMParams params, final CMEventListener iListener){
+    public static StrategyWeChat getInstance(){
         if (instance == null){
-            instance = new StrategyWeChat(params, iListener);
-        }else{
-            instance.update(params, iListener);
+            instance = new StrategyWeChat();
         }
         return instance;
+    }
+
+    @Override
+    public BaseModule create() {
+        mContext = cmParams.getActivity();
+        initWXAPI();
+        initBroadcast();
+        return super.create();
     }
 
     private void initWXAPI(){
@@ -73,6 +77,9 @@ public class StrategyWeChat extends BaseModule {
                         break;
                     case ConstantsAPI.COMMAND_SENDMESSAGE_TO_WX://分享
                         onWeChatShareResult(errorCode);
+                        break;
+                    case ConstantsAPI.COMMAND_PAY_BY_WX:
+                        onWeChatPayResult(errorCode);
                         break;
                 }
                 unRegisterResultBroadcast();
@@ -103,6 +110,24 @@ public class StrategyWeChat extends BaseModule {
     }
 
     /**
+     * 支付结果响应
+     * @param errorCode
+     */
+    private void onWeChatPayResult(final int errorCode){
+        switch (errorCode){
+            case BaseResp.ErrCode.ERR_OK://分享成功
+                listener.onEventSuccess(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_PAY_SUCCESS, null);
+                break;
+            case BaseResp.ErrCode.ERR_AUTH_DENIED://分享失败
+                listener.onEventFailed(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_PAY_FAILED);
+                break;
+            case BaseResp.ErrCode.ERR_USER_CANCEL://分享取消
+                listener.onEventCancel(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_PAY_CANCEL);
+                break;
+        }
+    }
+
+    /**
      * 分享结果响应
      * @param errorCode
      */
@@ -122,14 +147,7 @@ public class StrategyWeChat extends BaseModule {
 
     @Override
     public void doLogin() {
-        if (iwxapi == null) {
-            listener.onEventFailed(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_UNREGISTER);
-            return;
-        }
-        if (!iwxapi.isWXAppInstalled()){
-            listener.onEventFailed(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_UNINSTALL);
-            return;
-        }
+        if (!checkOperateValidity()){ return; }
         SendAuth.Req req = new SendAuth.Req();
         req.scope = cmParams.getUserSecret();
         req.state = cmParams.getWXState();
@@ -140,19 +158,43 @@ public class StrategyWeChat extends BaseModule {
 
     @Override
     public void doPay() {
+        TaskParams params = new TaskParams();
+        params.setAppID(cmParams.getAppID());
+        params.setMchID(cmParams.getMchID());
+        params.setTradeOutNum(cmParams.getOrderNum());
+        params.setTradeName(cmParams.getItemName());
+        params.setTradeDetail(cmParams.getItemDetail());
+        params.setTradePrice(cmParams.getItemPrice());
+        params.setSign(cmParams.getSignKey());
+        params.setCreateIp("14.23.150.211");
+        params.setNonceStr("1add1a30ac87aa2db72f57a2375d8fec");
+        params.setNotifyUrl(cmParams.getNotifyUrl());
 
+        new WeChatLoginTask(mContext).execute(params);
+    }
+
+    /**
+     *
+     * @param params
+     */
+    public void wxPayDoing(TaskParams params){
+        if (!checkOperateValidity()){ return; }
+        PayReq request = new PayReq();
+        request.appId = params.getAppID();
+        request.partnerId = params.getMchID();
+        request.prepayId= params.getPrepayID();
+        request.packageValue = "Sign=WXPay";
+        request.nonceStr=params.getNonceStr();
+        request.timeStamp= params.getTimeStamp();
+        request.sign= params.getSign();
+        iwxapi.sendReq(request);
+        //注册本地广播
+        registerResultBroadcast(mContext, WECHAT_PAY_RESULT_ACTION);
     }
 
     @Override
     public void doShare() {
-        if (iwxapi == null) {
-            listener.onEventFailed(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_UNREGISTER);
-            return;
-        }
-        if (!iwxapi.isWXAppInstalled()){
-            listener.onEventFailed(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_UNINSTALL);
-            return;
-        }
+        if (!checkOperateValidity()){ return; }
 
         WXMediaMessage.IMediaObject object = getShareObject();
 
@@ -231,5 +273,17 @@ public class StrategyWeChat extends BaseModule {
             e.printStackTrace();
         }
         return result;
+    }
+
+    private boolean checkOperateValidity(){
+        if (iwxapi == null) {
+            listener.onEventFailed(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_UNREGISTER);
+            return false;
+        }
+        if (!iwxapi.isWXAppInstalled()){
+            listener.onEventFailed(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_UNINSTALL);
+            return false;
+        }
+        return true;
     }
 }

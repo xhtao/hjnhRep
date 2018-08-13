@@ -6,12 +6,12 @@ package com.xht.cmsdk.network;
 
 public class HttpConnect implements IServerConnect {
     @Override
-    public void getRequest(ConnParams params, Callback callback) {
-
+    public String getRequest(ConnParams params, Callback callback) {
+        return null;
     }
 
     @Override
-    public void postRequest(ConnParams params, Callback callback) {
-
+    public String postRequest(ConnParams params, Callback callback) {
+        return null;
     }
 }

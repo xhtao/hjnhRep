@@ -129,7 +129,42 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 cmsdk.CMLogin();
                 break;
             case 4:
+                CMParams paramsP = new CMParams.PayBuilder(this)
+                        .appID(appId)
+                        .appSecret(secret)
+                        .channelType(ChannelType.TypeWeChat)
+                        .operateType(OperateType.TypeShare)
+                        .mchID("10000100")
+                        .orderNum("1415659990")
+                        .itemName("APP支付测试")
+                        .itemDetail("支付测试")
+                        .itemPrice(1)
+                        .notifyUrl("http://wxpay.wxutil.com/pub_v2/pay/notify.v2.php")
+                        .signKey("0CB01533B8C1EF103065174F50BCA001")
+                        .build();
+                cmsdk.setParams(paramsP)
+                        .setEventListener(new CMEventListener() {
+                            @Override
+                            public void onRequestStart() {
 
+                            }
+
+                            @Override
+                            public void onEventSuccess(int code, String jsonString) {
+
+                            }
+
+                            @Override
+                            public void onEventFailed(int code) {
+
+                            }
+
+                            @Override
+                            public void onEventCancel(int code) {
+
+                            }
+                        });
+                cmsdk.CMPay();
                 break;
             case 8:
                 CMParams paramsS = new CMParams.ShareBuilder(this)
