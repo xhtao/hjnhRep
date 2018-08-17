@@ -18,7 +18,9 @@ import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.xht.cmsdk.CMLog;
 import com.xht.cmsdk.CMSDK;
+import com.xht.cmsdk.enums.ErrorCodes;
 import com.xht.cmsdk.enums.ShareType;
+import com.xht.cmsdk.error.CMErrorFactory;
 import com.xht.cmsdk.module.BaseModule;
 import com.xht.cmsdk.service.ServiceLogic;
 import com.xht.cmsdk.tasks.WeChatLoginTask;
@@ -62,7 +64,8 @@ public class StrategyWeChat extends BaseModule {
     /**
      * 广播
      */
-    private void initBroadcast(){
+    @Override
+    protected void initBroadcast(){
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -116,13 +119,13 @@ public class StrategyWeChat extends BaseModule {
     private void onWeChatPayResult(final int errorCode){
         switch (errorCode){
             case BaseResp.ErrCode.ERR_OK://分享成功
-                listener.onEventSuccess(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_PAY_SUCCESS, null);
+                listener.onEventSuccess(CMErrorFactory.createCMError(ErrorCodes.Error_Code_Action_Success, null, cmParams, null));
                 break;
             case BaseResp.ErrCode.ERR_AUTH_DENIED://分享失败
-                listener.onEventFailed(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_PAY_FAILED);
+                listener.onEventFailed(CMErrorFactory.createCMError(ErrorCodes.Error_Code_Action_Failed, null, cmParams, null));
                 break;
             case BaseResp.ErrCode.ERR_USER_CANCEL://分享取消
-                listener.onEventCancel(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_PAY_CANCEL);
+                listener.onEventCancel(CMErrorFactory.createCMError(ErrorCodes.Error_Code_Action_Cancel, null, cmParams, null));
                 break;
         }
     }
@@ -134,13 +137,13 @@ public class StrategyWeChat extends BaseModule {
     private void onWeChatShareResult(final int errorCode){
         switch (errorCode){
             case BaseResp.ErrCode.ERR_OK://分享成功
-                listener.onEventSuccess(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_SHARE_SUCCESS, null);
+                listener.onEventSuccess(CMErrorFactory.createCMError(ErrorCodes.Error_Code_Action_Success, null, cmParams, null));
                 break;
             case BaseResp.ErrCode.ERR_AUTH_DENIED://分享失败
-                listener.onEventFailed(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_SHARE_FAILED);
+                listener.onEventFailed(CMErrorFactory.createCMError(ErrorCodes.Error_Code_Action_Failed, null, cmParams, null));
                 break;
             case BaseResp.ErrCode.ERR_USER_CANCEL://分享取消
-                listener.onEventCancel(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_SHARE_CANCEL);
+                listener.onEventCancel(CMErrorFactory.createCMError(ErrorCodes.Error_Code_Action_Cancel, null, cmParams, null));
                 break;
         }
     }
@@ -158,6 +161,7 @@ public class StrategyWeChat extends BaseModule {
 
     @Override
     public void doPay() {
+        if (!checkOperateValidity()){ return; }
         TaskParams params = new TaskParams();
         params.setAppID(cmParams.getAppID());
         params.setMchID(cmParams.getMchID());
@@ -178,7 +182,6 @@ public class StrategyWeChat extends BaseModule {
      * @param params
      */
     public void wxPayDoing(TaskParams params){
-        if (!checkOperateValidity()){ return; }
         PayReq request = new PayReq();
         request.appId = params.getAppID();
         request.partnerId = params.getMchID();
@@ -277,11 +280,11 @@ public class StrategyWeChat extends BaseModule {
 
     private boolean checkOperateValidity(){
         if (iwxapi == null) {
-            listener.onEventFailed(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_UNREGISTER);
+            listener.onEventFailed(CMErrorFactory.createCMError(ErrorCodes.Error_Code_UnRegister, null, cmParams, null));
             return false;
         }
         if (!iwxapi.isWXAppInstalled()){
-            listener.onEventFailed(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_UNINSTALL);
+            listener.onEventFailed(CMErrorFactory.createCMError(ErrorCodes.Error_Code_UnInstall, null, cmParams, null));
             return false;
         }
         return true;

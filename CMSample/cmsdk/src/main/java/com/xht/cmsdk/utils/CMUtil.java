@@ -1,5 +1,9 @@
 package com.xht.cmsdk.utils;
 
+import com.xht.cmsdk.enums.ChannelType;
+import com.xht.cmsdk.enums.ErrorCodes;
+import com.xht.cmsdk.enums.OperateType;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
@@ -130,9 +134,80 @@ public class CMUtil {
         return String.valueOf(millTime / 1000);
     }
 
+    /**
+     * 如str不为空，添加
+     * @param queryParams
+     * @param tag
+     * @param str
+     */
     public static void choseInput(Map<String, String> queryParams, String tag, String str){
         if (str != null){
             queryParams.put(tag, str);
+        }
+    }
+
+    /**
+     * 获取渠道名称
+     * @param type
+     * @return
+     */
+    public static String getChannelName(final ChannelType type){
+        switch (type){
+            case TypeWeChat:
+                return "微信";
+            case TypeQQ:
+                return "QQ";
+            case TypeAli:
+                return "支付宝";
+            case TypeWeiBo:
+                return "微博";
+            case TypeUP:
+                return "银联";
+            default:
+                return "未知渠道";
+        }
+    }
+
+    /**
+     * 获取操作名称
+     * @param type
+     * @return
+     */
+    public static String getOperateName(final OperateType type){
+        switch (type){
+            case TypeLogin:
+                return "登陆";
+            case TypePay:
+                return "支付";
+            case TypeShare:
+                return "分享";
+            default:
+                return "未知操作";
+        }
+    }
+
+    public static String getErrorMessage(final ErrorCodes codes){
+        switch (codes){
+            case Error_Code_DEFAULT:
+                return "未知错误";
+            case Error_Code_UnRegister:
+                return "SDK未注册";
+            case Error_Code_UnInstall:
+                return "应用未安装";
+            case Error_Code_Action_Success:
+                return "成功";
+            case Error_Code_Action_Failed:
+                return "失败";
+            case Error_Code_Action_Cancel:
+                return "取消";
+            case Error_Code_GetUserInfo_Success:
+                return "获取用户信息成功";
+            case Error_Code_GetUserInfo_Failed:
+                return "获取用户信息失败";
+            case Error_Code_GetToken_Failed:
+                return "获取token失败";
+            default:
+                return "";
         }
     }
 }

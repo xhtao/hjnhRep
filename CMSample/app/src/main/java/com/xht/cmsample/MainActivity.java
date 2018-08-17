@@ -1,5 +1,6 @@
 package com.xht.cmsample;
 
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +17,10 @@ import com.xht.cmsdk.callback.CMEventListener;
 import com.xht.cmsdk.enums.ChannelType;
 import com.xht.cmsdk.enums.OperateType;
 import com.xht.cmsdk.enums.ShareType;
+import com.xht.cmsdk.error.CMError;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,6 +79,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         cmsdk = CMSDK.getInstance();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        cmsdk.onActivityResult(requestCode, resultCode, data);
+    }
+
     private void connectLoading(String type){
         switch (type){
             case "show":
@@ -111,19 +122,54 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             }
 
                             @Override
-                            public void onEventSuccess(int code, String jsonString) {
+                            public void onEventSuccess(CMError cmError) {
                                 connectLoading("hide");
                             }
 
                             @Override
-                            public void onEventFailed(int code) {
+                            public void onEventFailed(CMError cmError) {
                                 connectLoading("hide");
-                                Toast.makeText(MainActivity.this, "登陆失败:" + code, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this, "登陆失败:" + cmError.getErrorCode(), Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
-                            public void onEventCancel(int code) {
+                            public void onEventCancel(CMError cmError) {
                                 connectLoading("hide");
+                            }
+                        });
+                cmsdk.CMLogin();
+                break;
+            case 1:
+                CMParams paramsQL = new CMParams.LoginBuilder(this)
+                        .appID("222222")
+                        .channelType(ChannelType.TypeQQ)
+                        .operateType(OperateType.TypeLogin)
+                        .build();
+                cmsdk.setParams(paramsQL)
+                        .setEventListener(new CMEventListener() {
+                            @Override
+                            public void onRequestStart() {
+                            }
+
+                            @Override
+                            public void onEventSuccess(CMError cmError) {
+                                try {
+                                    JSONObject jsonObject = new JSONObject(cmError.getErrorData());
+
+                                    Toast.makeText(MainActivity.this, jsonObject.getString("nickname"), Toast.LENGTH_SHORT).show();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onEventFailed(CMError cmError) {
+                                Toast.makeText(MainActivity.this, "失败：" + cmError.getErrorCode(), Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onEventCancel(CMError cmError) {
+                                Toast.makeText(MainActivity.this, "取消：" + cmError.getErrorCode(), Toast.LENGTH_SHORT).show();
                             }
                         });
                 cmsdk.CMLogin();
@@ -133,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         .appID(appId)
                         .appSecret(secret)
                         .channelType(ChannelType.TypeWeChat)
-                        .operateType(OperateType.TypeShare)
+                        .operateType(OperateType.TypePay)
                         .mchID("10000100")
                         .orderNum("1415659990")
                         .itemName("APP支付测试")
@@ -150,17 +196,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             }
 
                             @Override
-                            public void onEventSuccess(int code, String jsonString) {
+                            public void onEventSuccess(CMError cmError) {
 
                             }
 
                             @Override
-                            public void onEventFailed(int code) {
+                            public void onEventFailed(CMError cmError) {
 
                             }
 
                             @Override
-                            public void onEventCancel(int code) {
+                            public void onEventCancel(CMError cmError) {
 
                             }
                         });
@@ -171,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         .appID(appId)
                         .channelType(ChannelType.TypeWeChat)
                         .operateType(OperateType.TypeShare)
-                        .shareType(ShareType.WebPage)
+                        .shareType(ShareType.Image)
                         .shareTitle("百度一下")
                         .shareDescription("百度一下，你就知道... ...")
                         .shareBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.share_iamge))
@@ -186,18 +232,62 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                             }
 
                             @Override
-                            public void onEventSuccess(int code, String jsonString) {
-                                Toast.makeText(MainActivity.this, "分享成功:" + code, Toast.LENGTH_SHORT).show();
+                            public void onEventSuccess(CMError cmError) {
+                                Toast.makeText(MainActivity.this, "分享成功:" + cmError.getErrorCode(), Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
-                            public void onEventFailed(int code) {
-                                Toast.makeText(MainActivity.this, "分享失败:" + code, Toast.LENGTH_SHORT).show();
+                            public void onEventFailed(CMError cmError) {
+                                Toast.makeText(MainActivity.this, "分享失败:" + cmError.getErrorCode(), Toast.LENGTH_SHORT).show();
                             }
 
                             @Override
-                            public void onEventCancel(int code) {
-                                Toast.makeText(MainActivity.this, "分享取消:" + code, Toast.LENGTH_SHORT).show();
+                            public void onEventCancel(CMError cmError) {
+                                Toast.makeText(MainActivity.this, "分享取消:" + cmError.getErrorCode(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                cmsdk.CMShare();
+                break;
+            case 9:
+                ArrayList<String> imgList = new ArrayList<>();
+                imgList.add("https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1261189303,2074276937&fm=15&gp=0.jpg");
+                imgList.add("https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3801589511,4285793770&fm=27&gp=0.jpg");
+                imgList.add("https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1278190881,1035053171&fm=15&gp=0.jpg");
+                imgList.add("https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=573011341,2994726092&fm=15&gp=0.jpg");
+                imgList.add("https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=1373489527,3677276876&fm=15&gp=0.jpg");
+                imgList.add("https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2789295378,2052150349&fm=15&gp=0.jpg");
+                CMParams paramsQS = new CMParams.ShareBuilder(this)
+                        .appID("222222")
+                        .channelType(ChannelType.TypeQQ)
+                        .operateType(OperateType.TypeShare)
+                        .shareType(ShareType.TextAndImage)
+                        .sharePosition(ShareType.Session)
+                        .appName(this.getResources().getString(R.string.app_name))
+                        .shareTitle("QQ分享")
+                        .shareDescription("百度一下，你就知道... ...")
+                        .shareUrl("https://blog.csdn.net/qq_41138470/article/details/79017119")
+                        .shareImgUrl(imgList)
+                        .build();
+                cmsdk.setParams(paramsQS)
+                        .setEventListener(new CMEventListener() {
+                            @Override
+                            public void onRequestStart() {
+
+                            }
+
+                            @Override
+                            public void onEventSuccess(CMError cmError) {
+                                Toast.makeText(MainActivity.this, "分享成功:" + cmError.getErrorData(), Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onEventFailed(CMError cmError) {
+                                Toast.makeText(MainActivity.this, "分享失败:" + cmError.getErrorCode(), Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onEventCancel(CMError cmError) {
+                                Toast.makeText(MainActivity.this, "分享取消:" + cmError.getErrorCode(), Toast.LENGTH_SHORT).show();
                             }
                         });
                 cmsdk.CMShare();

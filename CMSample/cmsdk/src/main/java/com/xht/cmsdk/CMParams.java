@@ -8,12 +8,16 @@ import com.xht.cmsdk.enums.ChannelType;
 import com.xht.cmsdk.enums.OperateType;
 import com.xht.cmsdk.enums.ShareType;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 /**
  * Created by XIE on 2018/8/8.
  */
 
 public class CMParams {
     private Activity        activity            = null;
+    private String          appName             = null;
     private String          appID               = null;
     private ChannelType     channelType         = null;
     private OperateType     operateType         = null;
@@ -43,6 +47,7 @@ public class CMParams {
     private String          shareDescription    = null;
     private Bitmap          shareBitmap         = null;
     private String          shareUrl            = null;//地址，可能是：音乐、视频、web的url
+    private ArrayList<String> shareImgUrl         = null;//分享图片的地址
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
     public Activity getActivity() {
@@ -59,6 +64,14 @@ public class CMParams {
 
     public void setAppID(String appID) {
         this.appID = appID;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 
     public String getAppSecret() {
@@ -171,6 +184,14 @@ public class CMParams {
 
     public void setSignKey(String signKey) {
         this.signKey = signKey;
+    }
+
+    public ArrayList<String> getShareImgUrl() {
+        return shareImgUrl;
+    }
+
+    public void setShareImgUrl(ArrayList<String> shareImgUrl) {
+        this.shareImgUrl = shareImgUrl;
     }
 
     /**
@@ -412,6 +433,7 @@ public class CMParams {
     public static class ShareBuilder{
         private Activity        activity            = null;
         private String          appID               = null;
+        private String          appName             = null;
         private ChannelType     channelType         = null;
         private OperateType     operateType         = null;
 
@@ -421,6 +443,7 @@ public class CMParams {
         private String          shareDescription    = null;
         private Bitmap          shareBitmap         = null;
         private String          shareUrl            = null;//地址，可能是：音乐、视频、web的url
+        private ArrayList<String> shareImgUrl         = null;//分享图片的地址
 
         public ShareBuilder(Activity mActivity) {
             activity = mActivity;
@@ -428,6 +451,11 @@ public class CMParams {
 
         public CMParams.ShareBuilder appID(final String appid){
             appID = appid;
+            return this;
+        }
+
+        public CMParams.ShareBuilder appName(final String appname){
+            appName = appname;
             return this;
         }
 
@@ -471,11 +499,17 @@ public class CMParams {
             return this;
         }
 
+        public CMParams.ShareBuilder shareImgUrl(final ArrayList<String> imgUrl){
+            shareImgUrl = imgUrl;
+            return this;
+        }
+
         public CMParams build(){
             CMParams params = new CMParams();
 
             params.setActivity(activity);
             params.setAppID(appID);
+            params.setAppName(appName);
             params.setChannelType(channelType);
             params.setOperateType(operateType);
             params.setShareType(shareType);
@@ -484,6 +518,7 @@ public class CMParams {
             params.setShareDescription(shareDescription);
             params.setShareBitmap(shareBitmap);
             params.setShareUrl(shareUrl);
+            params.setShareImgUrl(shareImgUrl);
 
             return params;
         }

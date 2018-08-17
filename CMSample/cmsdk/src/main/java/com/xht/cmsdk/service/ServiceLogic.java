@@ -6,7 +6,9 @@ import com.xht.cmsdk.CMLog;
 import com.xht.cmsdk.CMParams;
 import com.xht.cmsdk.CMSDK;
 import com.xht.cmsdk.callback.CMEventListener;
+import com.xht.cmsdk.enums.ErrorCodes;
 import com.xht.cmsdk.enums.NetworkType;
+import com.xht.cmsdk.error.CMErrorFactory;
 import com.xht.cmsdk.network.ConnParams;
 import com.xht.cmsdk.network.IServerConnect;
 import com.xht.cmsdk.network.ServerConnectFactory;
@@ -51,7 +53,7 @@ public class ServiceLogic {
 
             @Override
             public void onFailed(String jsonStr) {
-                listener.onEventFailed(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_LOGIN_TOKEN_FAIL);
+                listener.onEventFailed(CMErrorFactory.createCMError(ErrorCodes.Error_Code_GetToken_Failed, null, cmParams, null));
             }
         });
     }
@@ -66,12 +68,12 @@ public class ServiceLogic {
         connect.getRequest(new ConnParams(path, CMUtil.map_to_string(paramMap, "utf-8")), new IServerConnect.Callback() {
             @Override
             public void onSuccess(String jsonStr) {
-                listener.onEventSuccess(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_LOGIN_SUCCESS, jsonStr);
+                listener.onEventSuccess(CMErrorFactory.createCMError(ErrorCodes.Error_Code_GetUserInfo_Success, null, cmParams, null));
             }
 
             @Override
             public void onFailed(String jsonStr) {
-                listener.onEventFailed(CMSDK.CMErrorCode.ERROR_CODE_WECHAT_LOGIN_USERINFO_FAIL);
+                listener.onEventFailed(CMErrorFactory.createCMError(ErrorCodes.Error_Code_GetUserInfo_Failed, null, cmParams, null));
             }
         });
     }

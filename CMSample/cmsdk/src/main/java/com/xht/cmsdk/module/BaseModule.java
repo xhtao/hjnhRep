@@ -2,6 +2,7 @@ package com.xht.cmsdk.module;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
 
@@ -47,6 +48,9 @@ public abstract class BaseModule implements IModule{
         return this;
     }
 
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    }
+
     protected void registerResultBroadcast(final Context context, final String action){
         if (mReceiver == null){ return; }
         weChat_result_action = action;
@@ -63,6 +67,8 @@ public abstract class BaseModule implements IModule{
             mReceiver = null;
         }
     }
+
+    protected abstract void initBroadcast();
 
     @Override
     public abstract void doLogin();
