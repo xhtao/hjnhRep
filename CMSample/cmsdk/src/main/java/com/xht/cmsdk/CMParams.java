@@ -32,7 +32,7 @@ public class CMParams {
 
     //支付
     private String          mchID               = null;
-    private String          orderNum            = null;
+    private String          orderNum            = null;//未知支付的随机串，支付宝支付的支付订单信息
     private String          itemName            = null;
     private String          itemDetail          = null;
     private int             itemPrice           = 0;

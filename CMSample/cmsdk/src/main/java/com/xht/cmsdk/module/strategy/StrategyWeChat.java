@@ -17,13 +17,12 @@ import com.tencent.mm.opensdk.modelpay.PayReq;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 import com.xht.cmsdk.CMLog;
-import com.xht.cmsdk.CMSDK;
 import com.xht.cmsdk.enums.ErrorCodes;
 import com.xht.cmsdk.enums.ShareType;
 import com.xht.cmsdk.error.CMErrorFactory;
 import com.xht.cmsdk.module.BaseModule;
 import com.xht.cmsdk.service.ServiceLogic;
-import com.xht.cmsdk.tasks.WeChatLoginTask;
+import com.xht.cmsdk.tasks.WeChatPayTask;
 import com.xht.cmsdk.tasks.taskrely.TaskParams;
 
 import java.io.ByteArrayOutputStream;
@@ -174,7 +173,7 @@ public class StrategyWeChat extends BaseModule {
         params.setNonceStr("1add1a30ac87aa2db72f57a2375d8fec");
         params.setNotifyUrl(cmParams.getNotifyUrl());
 
-        new WeChatLoginTask(mContext).execute(params);
+        new WeChatPayTask(mContext).execute(params);
     }
 
     /**
